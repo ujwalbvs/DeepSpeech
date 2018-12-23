@@ -87,7 +87,6 @@ def evaluate(test_data, inference_graph, alphabet):
                     FLAGS.lm_binary_path, FLAGS.lm_trie_path,
                     Config.alphabet)
 
-
     def create_windows(features):
         num_strides = len(features) - (Config.n_context * 2)
 
@@ -159,46 +158,52 @@ def evaluate(test_data, inference_graph, alphabet):
             logitses.append(logits)
             losses.extend(loss_)
 
-    ground_truths = []
-    predictions = []
-
-    print('Decoding predictions...')
-    bar = progressbar.ProgressBar(max_value=batch_count,
-                                  widget=progressbar.AdaptiveETA)
-
     # Get number of accessible CPU cores for this process
     try:
         num_processes = cpu_count()
     except:
         num_processes = 1
+    print('Using {} processes.'.format(num_processes))
 
-    # Second pass, decode logits and compute WER and edit distance metrics
-    for logits, batch in bar(zip(logitses, split_data(test_data, FLAGS.test_batch_size))):
-        seq_lengths = batch['features_len'].values.astype(np.int32)
-        decoded = ctc_beam_search_decoder_batch(logits, seq_lengths, alphabet, FLAGS.beam_width,
-                                                num_processes=num_processes, scorer=scorer)
+    for lm_alpha in np.linspace(0.00, 3.00, 16):
+        for lm_beta in np.linspace(0.00, 3.00, 16):
+            scorer.alpha = lm_alpha
+            scorer.beta = lm_beta
 
-        ground_truths.extend(alphabet.decode(l) for l in batch['transcript'])
-        predictions.extend(d[0][1] for d in decoded)
+            ground_truths = []
+            predictions = []
 
-    distances = [levenshtein(a, b) for a, b in zip(ground_truths, predictions)]
+            print('Decoding predictions...')
+            # bar = progressbar.ProgressBar(max_value=batch_count,
+            #                               widget=progressbar.AdaptiveETA)
 
-    wer, samples = calculate_report(ground_truths, predictions, distances, losses)
-    mean_edit_distance = np.mean(distances)
-    mean_loss = np.mean(losses)
+            # Second pass, decode logits and compute WER and edit distance metrics
+            for logits, batch in zip(logitses, split_data(test_data, FLAGS.test_batch_size)):
+                seq_lengths = batch['features_len'].values.astype(np.int32)
+                decoded = ctc_beam_search_decoder_batch(logits, seq_lengths, alphabet, FLAGS.beam_width,
+                                                        num_processes=num_processes, scorer=scorer)
 
-    # Take only the first report_count items
-    report_samples = itertools.islice(samples, FLAGS.report_count)
+                ground_truths.extend(alphabet.decode(l) for l in batch['transcript'])
+                predictions.extend(d[0][1] for d in decoded)
 
-    print('Test - WER: %f, CER: %f, loss: %f' %
-          (wer, mean_edit_distance, mean_loss))
-    print('-' * 80)
-    for sample in report_samples:
-        print('WER: %f, CER: %f, loss: %f' %
-              (sample.wer, sample.distance, sample.loss))
-        print(' - src: "%s"' % sample.src)
-        print(' - res: "%s"' % sample.res)
-        print('-' * 80)
+            distances = [levenshtein(a, b) for a, b in zip(ground_truths, predictions)]
+
+            wer, samples = calculate_report(ground_truths, predictions, distances, losses)
+            mean_edit_distance = np.mean(distances)
+            mean_loss = np.mean(losses)
+
+            # Take only the first report_count items
+            report_samples = itertools.islice(samples, FLAGS.report_count)
+
+            print('Test alpha=%f,beta=%f - WER: %f, CER: %f, loss: %f' %
+                  (lm_alpha, lm_beta, wer, mean_edit_distance, mean_loss))
+            print('-' * 80)
+            for sample in report_samples:
+                print('WER: %f, CER: %f, loss: %f' %
+                      (sample.wer, sample.distance, sample.loss))
+                print(' - src: "%s"' % sample.src)
+                print(' - res: "%s"' % sample.res)
+                print('-' * 80)
 
     return samples
 
