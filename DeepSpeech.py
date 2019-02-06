@@ -18,7 +18,7 @@ import traceback
 
 from ds_ctcdecoder import ctc_beam_search_decoder, Scorer
 from six.moves import zip, range
-from tensorflow.contrib.lite.python import tflite_convert
+from tensorflow.lite.python import tflite_convert
 from tensorflow.python.tools import freeze_graph
 from util.audio import audiofile_to_input_vector
 from util.config import Config, initialize_globals
@@ -109,7 +109,7 @@ def BiRNN(batch_x, seq_length, dropout, reuse=False, batch_size=None, n_steps=-1
 
     # Forward direction cell:
     if not tflite:
-        fw_cell = tf.contrib.rnn.LSTMBlockFusedCell(Config.n_cell_dim, reuse=reuse)
+        fw_cell = tf.contrib.cudnn_rnn.CudnnLSTM(num_layers=1, num_units=Config.n_cell_dim, direction='unidirectional', dtype=tf.float32)
         layers['fw_cell'] = fw_cell
     else:
         fw_cell = tf.nn.rnn_cell.LSTMCell(Config.n_cell_dim, reuse=reuse)
@@ -118,19 +118,13 @@ def BiRNN(batch_x, seq_length, dropout, reuse=False, batch_size=None, n_steps=-1
     # as the LSTM RNN expects its input to be of shape `[max_time, batch_size, input_size]`.
     layer_3 = tf.reshape(layer_3, [n_steps, batch_size, Config.n_hidden_3])
     if tflite:
-        # Generated StridedSlice, not supported by NNAPI
-        #n_layer_3 = []
-        #for l in range(layer_3.shape[0]):
-        #    n_layer_3.append(layer_3[l])
-        #layer_3 = n_layer_3
-
         # Unstack/Unpack is not supported by NNAPI
         layer_3 = tf.unstack(layer_3, n_steps)
 
     # We parametrize the RNN implementation as the training and inference graph
     # need to do different things here.
     if not tflite:
-        output, output_state = fw_cell(inputs=layer_3, dtype=tf.float32, sequence_length=seq_length, initial_state=previous_state)
+        output, output_state = fw_cell(inputs=layer_3, sequence_lengths=seq_length)
     else:
         output, output_state = tf.nn.static_rnn(fw_cell, layer_3, previous_state, tf.float32)
         output = tf.concat(output, 0)
@@ -253,12 +247,13 @@ def get_tower_results(model_feeder, optimizer, dropout_rates):
             with tf.device(device):
                 # Create a scope for all operations of tower i
                 with tf.name_scope('tower_%d' % i) as scope:
-                    # Calculate the avg_loss and mean_edit_distance and retrieve the decoded
-                    # batch along with the original batch's labels (Y) of this tower
-                    avg_loss = calculate_mean_edit_distance_and_loss(model_feeder, i, dropout_rates, reuse=i>0)
+                    with tf.variable_scope('foo', reuse=i>0):
+                        # Calculate the avg_loss and mean_edit_distance and retrieve the decoded
+                        # batch along with the original batch's labels (Y) of this tower
+                        avg_loss = calculate_mean_edit_distance_and_loss(model_feeder, i, dropout_rates, reuse=i>0)
 
                     # Allow for variables to be re-used by the next tower
-                    tf.get_variable_scope().reuse_variables()
+                    #tf.get_variable_scope().reuse_variables()
 
                     # Retain tower's avg losses
                     tower_avg_losses.append(avg_loss)

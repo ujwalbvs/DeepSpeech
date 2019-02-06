@@ -23,7 +23,7 @@ python -u DeepSpeech.py \
   --train_batch_size 1 \
   --dev_batch_size 1 \
   --test_batch_size 1 \
-  --n_hidden 494 \
+  --n_hidden 2048 \
   --epoch 75 \
   --checkpoint_dir "$checkpoint_dir" \
   "$@"
