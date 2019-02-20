@@ -3,7 +3,7 @@
 set -xe
 
 pip3 install -r <(grep -v tensorflow requirements.txt)
-pip3 install tensorflow-gpu==1.13.0-rc2
+pip3 install tensorflow-gpu==1.13.1
 
 # Install ds_ctcdecoder package from TaskCluster
 pip3 install $(python3 util/taskcluster.py --decoder)
@@ -15,7 +15,7 @@ fis="${data}/LDC/fisher"
 swb="${data}/LDC/LDC97S62/swb"
 lbs="${data}/OpenSLR/LibriSpeech/librivox"
 
-python3 -u DeepSpeech.py \
+stdbuf -i0 -o0 -e0 python3 DeepSpeech.py \
   --train_files "${fis}-train.csv","${swb}-train.csv","${lbs}-train-clean-100.csv","${lbs}-train-clean-360.csv","${lbs}-train-other-500.csv" \
   --dev_files "${lbs}-dev-clean.csv"\
   --test_files "${lbs}-test-clean.csv" \
@@ -24,9 +24,9 @@ python3 -u DeepSpeech.py \
   --test_batch_size 48 \
   --n_hidden 2048 \
   --learning_rate 0.0001 \
-  --dropout_rate 0.2 \
-  --epoch 13 \
+  --dropout_rate 0.15 \
+  --epoch 2 \
   --display_step 0 \
-  --validation_step 1 \
+  --validation_step 0 \
   --checkpoint_dir "../keep" \
   --summary_dir "../keep/summaries"
