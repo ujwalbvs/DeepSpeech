@@ -19,8 +19,8 @@
   #include "tensorflow/core/platform/env.h"
   #include "tensorflow/core/util/memmapped_file_system.h"
 #else // USE_TFLITE
-  #include "tensorflow/lite/model.h"
-  #include "tensorflow/lite/kernels/register.h"
+  #include "tensorflow/contrib/lite/model.h"
+  #include "tensorflow/contrib/lite/kernels/register.h"
 #endif // USE_TFLITE
 
 #include "ctcdecode/ctc_beam_search_decoder.h"
