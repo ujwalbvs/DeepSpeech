@@ -21,6 +21,8 @@ _logger = logging.getLogger(__name__)
 
 
 MAX_SECS = 10
+BITDEPTH = 16
+N_CHANNELS = 1
 SAMPLE_RATE = 16000
 
 DEV_PERCENTAGE = 0.10
@@ -177,7 +179,7 @@ class GramVaaniConverter:
             if not path.exists(wav_filename):
                 _logger.debug("Converting mp3 file %s to wav file %s" % (mp3_filename, wav_filename))
                 transformer = Transformer()
-                transformer.convert(samplerate=SAMPLE_RATE)
+                transformer.convert(samplerate=SAMPLE_RATE, n_channels=N_CHANNELS, bitdepth=BITDEPTH)
                 transformer.build(str(mp3_filename), str(wav_filename))
             else:
                 _logger.debug("Already converted mp3 file %s to wav file %s" % (mp3_filename, wav_filename))
