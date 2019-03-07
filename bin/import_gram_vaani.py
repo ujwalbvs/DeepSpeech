@@ -164,7 +164,7 @@ class GramVaaniConverter:
 
     def __init__(self, directory, mp3_directory):
         self.directory = directory
-        self.mp3_directory = mp3_directory
+        self.mp3_directory = Path(mp3_directory)
 
     def convert(self):
         """Converts the mp3's associated with this instance to wav's
@@ -178,7 +178,7 @@ class GramVaaniConverter:
                 _logger.debug("Converting mp3 file %s to wav file %s" % (mp3_filename, wav_filename))
                 transformer = Transformer()
                 transformer.convert(samplerate=SAMPLE_RATE)
-                transformer.build(mp3_filename, wav_filename)
+                transformer.build(str(mp3_filename), str(wav_filename))
             else:
                 _logger.debug("Already converted mp3 file %s to wav file %s" % (mp3_filename, wav_filename))
         return wav_directory
