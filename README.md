@@ -5,15 +5,17 @@ Run the following command for evaluation
 Batch Size functionality still under construction
 
 
-Use the following script rather than running the above command, need to pass in various arguments:
-Data Directory Location
-Output Directory Location
-Scripts Location(For running the initialization script
-DeepSpeech Folder Location(For running the main ./evaluate.pt)
-
+Use the following script rather than running the above command, need to pass in various arguments:  
+Data Directory Location  
+Output Directory Location  
+Scripts Location(For running the initialization script  
+DeepSpeech Folder Location(For running the main ./evaluate.pt)  
+  
 ./git\_repo/DeepSpeech/extraction/scripts/prepare\_and\_run.sh ~/data/final\_corpora/ ~/output/ ~/git\_repo/DeepSpeech/extraction/scripts/ ~/git\_repo/DeepSpeech/
 
-NOTE: Directories arguments should end with /
+NOTE:  
+Directories arguments should end with /  
+Assumes that venv is set up at /tmp as mentioned in the REDAME by Mozilla below  
 
 # Project DeepSpeech
 
