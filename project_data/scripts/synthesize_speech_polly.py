@@ -50,7 +50,7 @@ if __name__ == '__main__':
         aws_secret_access_key=private_key,
         region_name='us-west-2').client('polly')
 
-    n_gram_list = [1, 6]
+    n_gram_list = [1, 2, 6]
     for ng in n_gram_list:
         phrases_to_be_said = load_phrases_dict(ng)
         prepare_test_audio(phrases_to_be_said, ng, aws_polly_client)

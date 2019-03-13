@@ -28,3 +28,12 @@ def load_json(filename, parent_dir=Json_Home):
 
 def get_ids_for_speaker(speaker_id=Speaker_Id):
     return load_json(Speaker_Stats_Filename)[speaker_id]
+
+
+def extract_parent_fileid(fileid):
+    return fileid.split('_')[0]
+
+
+def load_all_test_phrases(n_gram):
+    return load_json("%s_%d.json" % (Test_Keywords_Filename_Prefix, n_gram))
+
