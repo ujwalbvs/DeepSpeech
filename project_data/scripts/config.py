@@ -20,3 +20,4 @@ Speaker_Id = "3752"     # This speaker has got the highest number of audio files
 Test_Keywords_Filename_Prefix = "test_phrases"
 Ground_Truth_Index_Name = "Ground_Truth_Index"
 Emitted_Index_Name = "Emitted_Index"
+Test_Keywords_Mapping_Prefix = "test_phrase_mapping"

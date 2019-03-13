@@ -57,10 +57,12 @@ def generate_phrases(num_phrases, n_gram, true_pos, in_eng_dict):
     for fileid in all_phrases:
         if fileid in true_pos_fileids:
             true_pos_phrases.extend(all_phrases[fileid])
-        else:
-            true_neg_phrases.extend(all_phrases[fileid])
-    # print("Generated %d true_positive phrases" % len(true_pos_phrases))     # 812 for 6-gram in our case
-    # print("Generated %d true_negative phrases" % len(true_neg_phrases))     # 40274 for 6-gram in our case
+    true_pos_set = set(true_pos_phrases)
+    for fileid in all_phrases:
+        if fileid not in true_pos_fileids:
+            true_neg_phrases.extend([ph for ph in all_phrases[fileid] if ph not in true_pos_set])
+    print("Generated %d true_positive phrases" % len(true_pos_phrases))     # 812 for 6-gram in our case
+    print("Generated %d true_negative phrases" % len(true_neg_phrases))     # 40274 for 6-gram in our case
 
     sample_set = true_pos_phrases if true_pos else true_neg_phrases
     random.shuffle(sample_set)
@@ -74,12 +76,15 @@ def generate_phrases(num_phrases, n_gram, true_pos, in_eng_dict):
 
 
 if __name__ == '__main__':
-    one_gram_all_phrases = get_all_phrases_by_fileid(1)
-    six_gram_all_phrases = get_all_phrases_by_fileid(6)
-    dump_json(one_gram_all_phrases, "%s_1.json" % All_Phrases_List_Filename_prefix)
-    dump_json(six_gram_all_phrases, "%s_6.json" % All_Phrases_List_Filename_prefix)
+    # This section generates all the n-gram phrases from the corpora
+    # n_gram_list = [1, 2, 6]
+    # for ng in n_gram_list:
+    #     all_phrase_list = get_all_phrases_by_fileid(ng)
+    #     dump_json(all_phrase_list, "%s_%d.json" % (All_Phrases_List_Filename_prefix, ng))
 
+    # This section generates the test phrases from the n-gram set generated above
     test_configs = [(1, True, True), (1, True, False), (1, False, True), (1, False, False),
+                    (2, True, True), (2, True, False), (2, False, True), (2, False, False),
                     (6, True, True), (6, True, False), (6, False, True), (6, False, False)]
 
     num_test_phrases = 100
