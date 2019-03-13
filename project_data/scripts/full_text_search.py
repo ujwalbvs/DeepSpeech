@@ -10,7 +10,7 @@ from utils import *
 import sys
 
 
-def get_top_k_docs(query_str, index_name, top_k=50):
+def get_top_k_docs(query_str, index_name, top_k=200):
     index = open_dir(Inv_Index_Home, indexname=index_name)
     with index.searcher(weighting=scoring.Frequency) as searcher:
         query = QueryParser("content", index.schema).parse(query_str)
@@ -31,7 +31,26 @@ def search_across_index(query_str):
     return {name: get_top_k_docs(query_str, name) for name in index_list}
 
 
+def get_fileids_from_test_key(test_file_names, n_gram):
+    all_test_phrases = load_all_test_phrases(n_gram)
+    overall_result = dict()
+    for filename in test_file_names:
+        key_id = filename.split(Wav_Ext)[0]
+        tp, _, _ = key_id.split("_")
+        test_phrase = '"%s"' % all_test_phrases[key_id]
+        search_results = get_top_k_docs(test_phrase, Ground_Truth_Index_Name)
+        fileids = [res['fileid'] for res in search_results['results']]
+        if tp == "TP":
+            assert(len(fileids) > 0)
+        else:
+            assert(len(fileids) == 0)
+        overall_result[filename] = fileids
+    return overall_result
+
+
 if __name__ == '__main__':
     query_s = sys.argv[1]
     data = search_across_index(query_s)
     print(data)
+    sample_filenames = ["TP_OD_2.wav", "TN_OD_1.wav", "TP_OD_3.wav", "TP_OD_4.wav"]
+    print(get_fileids_from_test_key(sample_filenames, 6))

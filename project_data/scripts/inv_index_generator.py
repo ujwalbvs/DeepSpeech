@@ -7,6 +7,7 @@ from config import *
 from utils import *
 from whoosh.index import create_in
 from whoosh.fields import Schema, TEXT, ID
+from whoosh import analysis
 import sys
 import os
 
@@ -19,8 +20,12 @@ def generate_inv_index(root_dir, index_name):
     :param index_name: name of the index (ground truth vs emitted)
     :return:
     """
+    # needed to include standard stop-words:
+    # SO: https://stackoverflow.com/questions/25087290/python-whoosh-seems-to-return-incorrect-results
+    custom_analyzer = analysis.StandardAnalyzer(expression=r'[\w-]+(\.?\w+)*', stoplist=None)
     schema = Schema(title=TEXT(stored=True), path=ID(stored=True),
-                    content=TEXT, textdata=TEXT(stored=True))
+                    content=TEXT(analyzer=analysis.StandardAnalyzer(stoplist=None)),
+                    textdata=TEXT(stored=True, analyzer=analysis.StandardAnalyzer(stoplist=None)))
 
     # Creating a index writer to add document as per schema
     ix = create_in(Inv_Index_Home, schema, indexname=index_name)
