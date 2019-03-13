@@ -34,4 +34,4 @@ cd $4
 
 source $HOME/tmp/deepspeech-venv/bin/activate
 #$4/evaluate.py --test_files /tmp/audio_files.csv --checkpoint_dir $4/checkpoint/ --embeddings_output_dir $2/ --test_batch_size 1
-./evaluate.py --test_files /tmp/audio_files.csv --checkpoint_dir checkpoint/ --test_batch_size 1 -embeddings_output_dir $2 --report_count 200
+./evaluate.py --test_files /tmp/audio_files.csv --checkpoint_dir checkpoint/ --test_batch_size 1 -embeddings_output_dir $2 --report_count 500 --ignore_longer_outputs_than_inputs
