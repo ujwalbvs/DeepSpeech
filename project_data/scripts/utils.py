@@ -36,4 +36,3 @@ def extract_parent_fileid(fileid):
 
 def load_all_test_phrases(n_gram):
     return load_json("%s_%d.json" % (Test_Keywords_Filename_Prefix, n_gram))
-

@@ -15,6 +15,6 @@ def generate_mapping(n_gram):
 
 
 if __name__ == '__main__':
-    n_grams = [1, 2, 6]
+    n_grams = [3, 4, 5]
     for ng in n_grams:
         generate_mapping(ng)
