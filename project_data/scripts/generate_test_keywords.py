@@ -77,15 +77,15 @@ def generate_phrases(num_phrases, n_gram, true_pos, in_eng_dict):
 
 if __name__ == '__main__':
     # This section generates all the n-gram phrases from the corpora
-    # n_gram_list = [1, 2, 6]
-    # for ng in n_gram_list:
-    #     all_phrase_list = get_all_phrases_by_fileid(ng)
-    #     dump_json(all_phrase_list, "%s_%d.json" % (All_Phrases_List_Filename_prefix, ng))
+    n_gram_list = [3, 4, 5]
+    for ng in n_gram_list:
+        all_phrase_list = get_all_phrases_by_fileid(ng)
+        dump_json(all_phrase_list, "%s_%d.json" % (All_Phrases_List_Filename_prefix, ng))
 
     # This section generates the test phrases from the n-gram set generated above
-    test_configs = [(1, True, True), (1, True, False), (1, False, True), (1, False, False),
-                    (2, True, True), (2, True, False), (2, False, True), (2, False, False),
-                    (6, True, True), (6, True, False), (6, False, True), (6, False, False)]
+    test_configs = [(3, True, True), (3, True, False), (3, False, True), (3, False, False),
+                    (4, True, True), (4, True, False), (4, False, True), (4, False, False),
+                    (5, True, True), (5, True, False), (5, False, True), (5, False, False)]
 
     num_test_phrases = 100
     overall_dict = defaultdict(dict)

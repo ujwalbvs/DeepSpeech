@@ -52,5 +52,5 @@ if __name__ == '__main__':
     query_s = sys.argv[1]
     data = search_across_index(query_s)
     print(data)
-    sample_filenames = ["TP_OD_2.wav", "TN_OD_1.wav", "TP_OD_3.wav", "TP_OD_4.wav"]
-    print(get_fileids_from_test_key(sample_filenames, 6))
+    # sample_filenames = ["TP_OD_2.wav", "TN_OD_1.wav", "TP_OD_3.wav", "TP_OD_4.wav"]
+    # print(get_fileids_from_test_key(sample_filenames, 6))
